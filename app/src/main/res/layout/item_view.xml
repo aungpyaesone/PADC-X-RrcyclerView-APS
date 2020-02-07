@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+   <androidx.cardview.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:cardElevation="4dp"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imgView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/greetings_04"/>
+
+            <org.mmtextview.components.MMTextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/imgView"
+                android:layout_marginStart="@dimen/margin_medium_2"
+                android:text="@string/padc_myanmar"/>
+
+            <org.mmtextview.components.MMTextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/title"
+                android:text="@string/aaa"
+                android:lineSpacingMultiplier="1.3"
+                android:layout_margin="@dimen/margin_medium_2"
+                android:textSize="@dimen/text_regular_2x"
+                android:textStyle="bold"
+                android:maxLines="3"/>
+
+
+            <org.mmtextview.components.MMTextView
+                android:id="@+id/viewCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/description"
+                android:layout_alignStart="@id/description"
+                android:layout_marginBottom="@dimen/margin_medium"
+                android:text="@string/_2000_views"/>
+
+            <org.mmtextview.components.MMTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/description"
+                android:layout_marginBottom="@dimen/margin_medium"
+                android:layout_alignEnd="@id/description"
+                android:text="@string/like"/>
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
