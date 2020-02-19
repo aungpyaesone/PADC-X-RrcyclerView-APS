@@ -1,7 +1,9 @@
 package com.aungpyaesone.padc_x_rrcyclerview_aps.activities
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.aungpyaesone.padc_x_rrcyclerview_aps.R
@@ -11,13 +13,19 @@ import com.aungpyaesone.padc_x_rrcyclerview_aps.data.models.NewsModel
 import com.aungpyaesone.padc_x_rrcyclerview_aps.data.models.NewsModelImpl
 import com.aungpyaesone.padc_x_rrcyclerview_aps.delegation.NewsItemDelegate
 import com.aungpyaesone.padc_x_rrcyclerview_aps.view.viewpods.EmptyViewPod
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity(),NewsItemDelegate {
 
-    val mNewModel : NewsModel = NewsModelImpl
+    private val mNewModel : NewsModel = NewsModelImpl
     private lateinit var mAdapter: NewsListAdapter
     private lateinit var viewPortEmpty: EmptyViewPod
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onTouchNewsItem(id:Int) {
         startActivity(DetailActivity.newIntent(this,id))
@@ -35,7 +43,6 @@ class MainActivity : BaseActivity(),NewsItemDelegate {
         setUpRecyclerView()
         requestData()
         setUpViewPod()
-
 
     }
 
@@ -61,8 +68,25 @@ class MainActivity : BaseActivity(),NewsItemDelegate {
     }
 
    private fun requestData(){
+      //  mNewModel = NewsModelImpl
         swipeRefreshLayout.isRefreshing = true
-        mNewModel.getAllNews(
+
+        mNewModel.getAllNews(onError = {
+           swipeRefreshLayout.isRefreshing = false
+           showEmptyView()
+           Log.e("error",it)
+       }).observe(this, Observer {
+           swipeRefreshLayout.isRefreshing = false
+           if(it.isNotEmpty()){
+               hideEmptyView()
+               mAdapter.setData(it.toMutableList())
+           }
+
+       })
+
+       // simple callback
+
+       /* mNewModel.getAllNews(
             onSuccess = {
                 // Bind Data with Recycler View
            //     val newList = it
@@ -84,18 +108,42 @@ class MainActivity : BaseActivity(),NewsItemDelegate {
                 swipeRefreshLayout.isRefreshing = false
                 showEmptyView()
             }
-        )
+        )*/
+
+
+       // with Rx
+     /*  mNewModel.getAllNews()
+          // .subscribeOn(Schedulers.io())// it is upstream for running on background thread
+           .observeOn(AndroidSchedulers.mainThread()) // it is for running on main thread ( downstream )
+           .subscribe(
+           {
+               swipeRefreshLayout.isRefreshing = true
+               if(it.isNotEmpty()){
+                   mAdapter.setData(it.toMutableList())
+               }
+               else{
+                   showEmptyView()
+               }
+           },
+           {
+               showSnackBar(it.message.toString())
+               swipeRefreshLayout.isRefreshing = false
+               showEmptyView()
+           }
+
+       ).addTo(compositeDisposable)*/
     }
 
     private fun showEmptyView(){
-        /*emptyImage.visibility = View.VISIBLE
-        tvEmpty.visibility = View.VISIBLE*/
         vpEmpty.visibility = View.VISIBLE
     }
 
     private fun hideEmptyView(){
-      /*  emptyImage.visibility = View.GONE
-        tvEmpty.visibility = View.GONE*/
         vpEmpty.visibility = View.GONE
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.dispose()
     }
 }

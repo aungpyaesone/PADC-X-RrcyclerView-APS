@@ -1,6 +1,6 @@
 package com.aungpyaesone.padc_x_rrcyclerview_aps.Utils
 
-const val BASE_URL = "http://d5b9fce1-1306-406b-8b76-698a75f99177.mock.pstmn.io/"
+const val BASE_URL = "https://952b225a-88ce-4e4c-95c7-b92234ef728f.mock.pstmn.io/"
 const val END_POINT = "getAllNews"
 const val PARAM_ACCESS_TOKEN =""
 const val ACCESS_TOKEN =""

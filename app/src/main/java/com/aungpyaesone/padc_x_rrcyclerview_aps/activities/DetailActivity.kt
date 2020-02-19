@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import androidx.lifecycle.Observer
 import com.aungpyaesone.padc_x_rrcyclerview_aps.R
 import com.aungpyaesone.padc_x_rrcyclerview_aps.data.models.NewsModel
 import com.aungpyaesone.padc_x_rrcyclerview_aps.data.models.NewsModelImpl
@@ -29,15 +31,26 @@ class DetailActivity : BaseActivity() {
         setContentView(R.layout.activity_detail)
        // showAlertDialog("Hello BaseActivity, I am main activity")
         var newsId = intent.getIntExtra(NEWS_ID,0)
-        val newsVo = mNewsModel.getNewsById(newsId)
+        mNewsModel.getNewsById(newsId)
+            .observe(this, Observer {
 
-        Glide.with(this)
-            .load(newsVo.heroImage)
-            .into(imgDetail)
+                it?.let { newsVo ->
+                    Glide.with(this)
+                        .load(newsVo.heroImage)
+                        .into(imgDetail)
 
-        tv_title.text = newsVo.title
-        date.text = newsVo.publication?.postedDate
-        description.text = newsVo.description
+                    tv_title.text = newsVo.title
+                    date.text = newsVo.publication?.postedDate
+                    description.text = newsVo.description
+
+                    newsVo.comments.forEach {
+                        Log.e("ccc", it.commentMessage)
+                    }
+                }
+
+            })
+
+
 
     }
 }

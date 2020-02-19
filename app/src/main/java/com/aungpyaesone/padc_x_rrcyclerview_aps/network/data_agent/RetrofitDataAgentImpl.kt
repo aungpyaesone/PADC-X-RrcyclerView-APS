@@ -35,7 +35,7 @@ object RetrofitDataAgentImpl : NewsDataAgent {
         onSuccess: (List<NewsVO>) -> Unit,
         onFailure: (String) -> Unit
     ) {
-        val getAllNewsCall = mNewApi?.getAllNews(accessToken)
+     /*   val getAllNewsCall = mNewApi?.getAllNews(accessToken)
         getAllNewsCall?.enqueue(object : Callback<GetAllNewsResponse> {
             override fun onFailure(call: Call<GetAllNewsResponse>, t: Throwable) {
                onFailure(t.message ?: EN_CONNECTION_ERROR)
@@ -62,7 +62,7 @@ object RetrofitDataAgentImpl : NewsDataAgent {
                     onFailure(EN_CONNECTION_ERROR)
                 }
             }
-        })
+        })*/
     }
 
 }
