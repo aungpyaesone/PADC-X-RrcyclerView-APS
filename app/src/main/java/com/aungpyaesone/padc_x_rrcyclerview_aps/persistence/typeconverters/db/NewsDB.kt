@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.aungpyaesone.padc_x_rrcyclerview_aps.data.vos.NewsVO
 import com.aungpyaesone.padc_x_rrcyclerview_aps.persistence.typeconverters.daos.NewsDao
 
-@Database (entities = [NewsVO::class], version = 2,exportSchema = false)
+@Database (entities = [NewsVO::class], version = 3,exportSchema = false)
 abstract class NewsDB: RoomDatabase() {
 
     companion object{
@@ -20,6 +20,7 @@ abstract class NewsDB: RoomDatabase() {
                     dbInstance = Room.databaseBuilder(context,NewsDB::class.java,
                         DB_NAME)
                         .allowMainThreadQueries()
+                        .fallbackToDestructiveMigration()
                         .build()
                 }
             }

@@ -28,7 +28,7 @@ class SmallViewHolder(itemView: View,delegate:NewsItemDelegate) : CustomBaseView
           //  delegate.onTouchNewsItem()
             mData?.let {
                 newsVO ->
-                delegate.onTouchNewsItem(it.id)
+                delegate.onTouchNewsItem(newsVO.id)
             }
         }
     }

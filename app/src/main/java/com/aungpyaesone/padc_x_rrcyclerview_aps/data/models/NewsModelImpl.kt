@@ -61,7 +61,5 @@ object NewsModelImpl: NewsModel, BaseModel() {
         }
         return NewsVO()*/
        return mTheDB.newsDao().getNewsById(newsId)
-
-
-    }
+   }
 }

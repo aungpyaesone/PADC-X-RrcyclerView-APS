@@ -11,7 +11,11 @@ import com.aungpyaesone.padc_x_rrcyclerview_aps.adapter.BaseRecyclerAdapter
 import com.aungpyaesone.padc_x_rrcyclerview_aps.adapter.NewsListAdapter
 import com.aungpyaesone.padc_x_rrcyclerview_aps.data.models.NewsModel
 import com.aungpyaesone.padc_x_rrcyclerview_aps.data.models.NewsModelImpl
+import com.aungpyaesone.padc_x_rrcyclerview_aps.data.vos.NewsVO
 import com.aungpyaesone.padc_x_rrcyclerview_aps.delegation.NewsItemDelegate
+import com.aungpyaesone.padc_x_rrcyclerview_aps.mvp.presenters.MainPresenter
+import com.aungpyaesone.padc_x_rrcyclerview_aps.mvp.presenters.MainPresenterImpl
+import com.aungpyaesone.padc_x_rrcyclerview_aps.mvp.views.MainView
 import com.aungpyaesone.padc_x_rrcyclerview_aps.view.viewpods.EmptyViewPod
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -20,30 +24,67 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : BaseActivity(),NewsItemDelegate {
+class MainActivity : BaseActivity(),MainView {
 
-    private val mNewModel : NewsModel = NewsModelImpl
+   // private val mNewModel : NewsModel = NewsModelImpl
     private lateinit var mAdapter: NewsListAdapter
     private lateinit var viewPortEmpty: EmptyViewPod
     private val compositeDisposable = CompositeDisposable()
 
-    override fun onTouchNewsItem(id:Int) {
+    private lateinit var mPresenter: MainPresenter
+
+  /*  override fun onTouchNewsItem(id:Int) {
         startActivity(DetailActivity.newIntent(this,id))
     }
 
     override fun touchLike() {
        // Snackbar.make(coordinator_layout,"Hi there! ",Snackbar.LENGTH_SHORT).show()
-    }
+    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        hideEmptyView()
+
+        setUpPresenter()
         setUpSwipeRefresh()
         setUpRecyclerView()
-        requestData()
         setUpViewPod()
+        mPresenter.onCreate()
 
+    }
+
+    private fun setUpPresenter(){
+        mPresenter = MainPresenterImpl()
+        mPresenter.initPresenter(this)
+    }
+
+    // main view override method
+    override fun displayNewsList(newsList: List<NewsVO>) {
+        mAdapter.setData(newsList.toMutableList())
+    }
+
+    override fun enableSwipeRefresh() {
+       swipeRefreshLayout.isRefreshing = true
+    }
+
+    override fun disableSwipeRefresh() {
+       swipeRefreshLayout.isRefreshing = false
+    }
+
+    override fun showEmptyView() {
+       vpEmpty.visibility = View.VISIBLE
+    }
+
+    override fun hideEmptyView() {
+        vpEmpty.visibility = View.GONE
+    }
+
+    override fun showError(message: String) {
+       showSnackBar(message)
+    }
+
+    override fun navigateToNewsDetails(newsId: Int) {
+      startActivity(DetailActivity.newIntent(this,newsId))
     }
 
     private fun setUpViewPod(){
@@ -53,12 +94,12 @@ class MainActivity : BaseActivity(),NewsItemDelegate {
 
     private fun setUpSwipeRefresh(){
         swipeRefreshLayout.setOnRefreshListener {
-            requestData()
+            mPresenter.onSwipeRefresh()
         }
     }
 
     private fun setUpRecyclerView(){
-        mAdapter = NewsListAdapter(this)
+        mAdapter = NewsListAdapter(mPresenter)
         val linearLayoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
 
         val gridLayoutManager = GridLayoutManager(this,2)
@@ -67,83 +108,29 @@ class MainActivity : BaseActivity(),NewsItemDelegate {
 
     }
 
-   private fun requestData(){
-      //  mNewModel = NewsModelImpl
-        swipeRefreshLayout.isRefreshing = true
-
-        mNewModel.getAllNews(onError = {
-           swipeRefreshLayout.isRefreshing = false
-           showEmptyView()
-           Log.e("error",it)
-       }).observe(this, Observer {
-           swipeRefreshLayout.isRefreshing = false
-           if(it.isNotEmpty()){
-               hideEmptyView()
-               mAdapter.setData(it.toMutableList())
-           }
-
-       })
-
-       // simple callback
-
-       /* mNewModel.getAllNews(
-            onSuccess = {
-                // Bind Data with Recycler View
-           //     val newList = it
-                if(it.isNotEmpty()){
-
-                   mAdapter.setData(it.toMutableList())
-                }
-                else{
-                    showEmptyView()
-                }
-
-                swipeRefreshLayout.isRefreshing = false
-
-            },
-            onFailure = {
-                // Show Error Message
-           //     val errorMessage = it
-                showSnackBar(it)
-                swipeRefreshLayout.isRefreshing = false
-                showEmptyView()
-            }
-        )*/
-
-
-       // with Rx
-     /*  mNewModel.getAllNews()
-          // .subscribeOn(Schedulers.io())// it is upstream for running on background thread
-           .observeOn(AndroidSchedulers.mainThread()) // it is for running on main thread ( downstream )
-           .subscribe(
-           {
-               swipeRefreshLayout.isRefreshing = true
-               if(it.isNotEmpty()){
-                   mAdapter.setData(it.toMutableList())
-               }
-               else{
-                   showEmptyView()
-               }
-           },
-           {
-               showSnackBar(it.message.toString())
-               swipeRefreshLayout.isRefreshing = false
-               showEmptyView()
-           }
-
-       ).addTo(compositeDisposable)*/
+    override fun onStart() {
+        super.onStart()
+        mPresenter.onStart()
     }
 
-    private fun showEmptyView(){
-        vpEmpty.visibility = View.VISIBLE
+    override fun onResume() {
+        super.onResume()
+        mPresenter.onResume()
     }
 
-    private fun hideEmptyView(){
-        vpEmpty.visibility = View.GONE
+    override fun onPause() {
+        super.onPause()
+        mPresenter.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mPresenter.onStop()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        mPresenter.onDestroy()
         compositeDisposable.dispose()
     }
 }

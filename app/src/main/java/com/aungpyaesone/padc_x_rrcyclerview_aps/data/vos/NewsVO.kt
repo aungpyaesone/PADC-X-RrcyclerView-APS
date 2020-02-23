@@ -17,7 +17,7 @@ data class NewsVO(
     @SerializedName("hero_image")var heroImage: String="",
     @SerializedName("description")var description: String ="",
 
-    @Embedded
+    @Embedded(prefix = "_publication")
     @SerializedName("publication")var publication: PublicationVO? = null,
     @SerializedName("liked_users")var likedUsers: ArrayList<UserVO> = arrayListOf(),
     @SerializedName("comments")var comments: ArrayList<CommentVO> = arrayListOf()

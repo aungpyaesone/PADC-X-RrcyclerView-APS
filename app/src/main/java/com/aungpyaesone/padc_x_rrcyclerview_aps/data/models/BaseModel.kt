@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit
 
 abstract class BaseModel {
 
-
    protected var mNewApi: NewsApi
    protected lateinit var mTheDB: NewsDB
 
